@@ -5,7 +5,7 @@
 
 using namespace std;
 
-//Game::Game(){}
+Game::Game(){}
 
 void Game::start()
 {
@@ -20,5 +20,27 @@ void Game::start()
 }
 bool Game::winChecker(char symbol)
 {
-    return true;
+    int winCombo[8][3] = 
+    {
+        {0,1,2},
+        {3,4,5},
+        {6,7,8},
+        {0,3,6},
+        {1,4,7},
+        {2,5,8},
+        {0,4,8},
+        {2,4,6}
+    };
+    for (auto combo : winCombo)
+    {
+        if (board.grid[combo[0]] == symbol &&
+            board.grid[combo[1]] == symbol &&
+            board.grid[combo[2]] == symbol)
+            {
+                cout << symbol << " is the winner!" << endl;
+                return true;
+            }
+    }
+    cout << symbol << " is NOT the winner!" << endl;
+    return false;
 }
