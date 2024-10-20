@@ -24,7 +24,7 @@ void Board::display()
 
 bool Board::move(int spot, char symbol)
 {
-    if (grid[spot-1] == 'x' || grid[spot-1] == 'o')
+    if (grid[spot-1] == 'X' || grid[spot-1] == 'O')
     {
         return false;
         //validatorInput checks if the user input is 1~9
@@ -40,7 +40,7 @@ bool Board::full()
 {
     for (char c: grid)
     {
-        if (c != 'x' && c != 'o')
+        if (c != 'X' && c != 'O')
         {
             return false;
         }

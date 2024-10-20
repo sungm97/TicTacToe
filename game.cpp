@@ -8,7 +8,7 @@ using namespace std;
 
 Game::Game()
 {
-    currentPlayer = 'x';
+    currentPlayer = 'X';
 }
 
 void Game::start()
@@ -26,7 +26,7 @@ void Game::start()
             if (running)
             {
                 board.reset();
-                currentPlayer = 'x';
+                currentPlayer = 'X';
             }
 
         }
@@ -38,7 +38,7 @@ void Game::start()
             if (running)
             {
                 board.reset();
-                currentPlayer = 'x';
+                currentPlayer = 'X';
             }
         }
         else
@@ -73,13 +73,13 @@ bool Game::winChecker(char symbol)
 }
 void Game::switchPlayer()
 {
-    if (currentPlayer == 'x')
+    if (currentPlayer == 'X')
     {
-        currentPlayer = 'o';
+        currentPlayer = 'O';
     }
     else
     {
-        currentPlayer = 'x';
+        currentPlayer = 'X';
     }
 }
 bool Game::validateInput()
@@ -139,7 +139,8 @@ bool Game::playAgain()
             cout << "1 Invalid input! Please enter 'Y' or 'N'.\n";
         }
         char choice = toupper(input[0]);
-        if (choice == 'Y') {
+        if (choice == 'Y') 
+        {
             return true;
         } 
         else if (choice == 'N') 
