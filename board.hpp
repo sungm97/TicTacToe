@@ -11,7 +11,7 @@ public:
     Board();
     std::vector<char> grid;
     void display();
-    bool move(int spot);
+    bool move(int spot, char symbol);
     bool full();
     void reset();
 };

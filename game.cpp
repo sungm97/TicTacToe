@@ -1,21 +1,50 @@
 #include "game.hpp"
 #include <iostream>
+#include <string>
 #include <vector>
 
 
 using namespace std;
 
-Game::Game(){}
+Game::Game()
+{
+    currentPlayer = 'x';
+}
 
 void Game::start()
 {
     bool running = true;
     while (running)
     {
-        cout << "Welcome to Tic Tac Toe!" << "\n" << "Player 1 will go first and will be 'X'" << endl;
         board.display();
-        running = false;
-        
+        promptMove();
+        if (winChecker(currentPlayer))
+        {
+            board.display();
+            cout << "Player " << currentPlayer << " is the winner!" << endl;
+            running = playAgain();
+            if (running)
+            {
+                board.reset();
+                currentPlayer = 'x';
+            }
+
+        }
+        else if (board.full())
+        {
+            board.display();
+            cout << "It's a draw!" << endl;
+            running = playAgain();
+            if (running)
+            {
+                board.reset();
+                currentPlayer = 'x';
+            }
+        }
+        else
+        {
+            switchPlayer();
+        }
     }
 }
 bool Game::winChecker(char symbol)
@@ -37,10 +66,90 @@ bool Game::winChecker(char symbol)
             board.grid[combo[1]] == symbol &&
             board.grid[combo[2]] == symbol)
             {
-                cout << symbol << " is the winner!" << endl;
                 return true;
             }
     }
-    cout << symbol << " is NOT the winner!" << endl;
     return false;
+}
+void Game::switchPlayer()
+{
+    if (currentPlayer == 'x')
+    {
+        currentPlayer = 'o';
+    }
+    else
+    {
+        currentPlayer = 'x';
+    }
+}
+bool Game::validateInput()
+{
+    //int input;
+    cin >> input;
+    if (cin.fail())
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return false;
+    } 
+    else if (input < 1 || input > 9)
+    {
+        cin.clear();
+        return false;
+    }
+    cin.clear();
+    return true;
+}
+
+void Game::promptMove()
+{
+    bool valid = false;
+    while (!valid)
+    {
+        cout << "Player " << currentPlayer << " enter the number you would like to make a move: " << endl;
+        if (validateInput())
+        {
+            if (board.move(input, currentPlayer))
+            {
+                board.display();
+                valid = true;
+            }
+            else
+            {
+                board.display();
+                cout << "Invalid input! The spot is taken! Please choose an OPEN spot!" << endl;
+            }
+        }
+        else
+        {
+            board.display();
+            cout << "Invalid input! Please pick an integer between 1 and 9. Remember integers are whole numbers!" << endl;
+        }
+    }
+}
+bool Game::playAgain()  
+{
+    while (true) 
+    {
+        cin.clear();
+        cout << "Do you want to play again? (Y/N): ";
+        string input;
+        cin >> input;
+        if (cin.fail()) {
+            cout << "1 Invalid input! Please enter 'Y' or 'N'.\n";
+        }
+        char choice = toupper(input[0]);
+        if (choice == 'Y') {
+            return true;
+        } 
+        else if (choice == 'N') 
+        {
+            cout << "Thank you for playing!\n";
+            return false;
+        } 
+        else 
+        {
+            cout << "Invalid input! Please enter 'Y' or 'N'.\n";
+        }
+    }
 }

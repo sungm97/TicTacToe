@@ -8,13 +8,15 @@ class Game
     private:
     public:
         Board board;
+        int input;
         Game();
         void start();
         bool winChecker(char symbol);
-        //char currentPlayer();
-        //void switchPlayer();
-        //void promptMove();
-        //bool playAgain();
+        bool validateInput();
+        char currentPlayer;
+        void switchPlayer();
+        void promptMove();
+        bool playAgain();
         
         
 };

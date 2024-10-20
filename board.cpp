@@ -22,16 +22,16 @@ void Board::display()
     }
 }
 
-bool Board::move(int spot)
+bool Board::move(int spot, char symbol)
 {
-    if (spot < 1 || spot > 9)
+    if (grid[spot-1] == 'x' || grid[spot-1] == 'o')
     {
         return false;
-        //still need to check if the spot is occupied
+        //validatorInput checks if the user input is 1~9
     }
     else
     {
-        grid[spot - 1] = 'x';
+        grid[spot - 1] = symbol;
     }
     return true;
 
@@ -42,11 +42,9 @@ bool Board::full()
     {
         if (c != 'x' && c != 'o')
         {
-            cout << "NOT FULL" << endl;
             return false;
         }
     }
-    cout << "FULL" << endl;
     return true;
 }
 void Board::reset()
