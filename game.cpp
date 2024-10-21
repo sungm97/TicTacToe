@@ -84,34 +84,44 @@ void Game::switchPlayer()
 }
 bool Game::validateInput()
 {
-    //int input;
-    cin >> input;
-    if (cin.fail())
+    getline(cin, input); 
+    if (input.empty())
     {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        return false;
-    } 
-    else if (input < 1 || input > 9)
-    {
-        cin.clear();
         return false;
     }
-    cin.clear();
+
+    for (char c : input)
+    {
+        if (!isdigit(c))
+        {
+            return false;
+        }
+    }
+
+    int value = stoi(input); 
+
+    if (value < 1 || value > 9)
+    {
+        return false;
+    }
+    validInput = value;
     return true;
 }
 
 void Game::promptMove()
 {
+    cin.clear();
     bool valid = false;
     while (!valid)
     {
-        cout << "Player " << currentPlayer << " enter the number you would like to make a move: " << endl;
+        cin.clear();
+        cout << "\nPlayer " << currentPlayer << ": Enter the number you would like to make a move: " << endl;
         if (validateInput())
         {
-            if (board.move(input, currentPlayer))
+            if (board.move(validInput, currentPlayer))
             {
-                board.display();
+                //board.display();
+                counter++;
                 valid = true;
             }
             else
@@ -120,10 +130,14 @@ void Game::promptMove()
                 cout << "Invalid input! The spot is taken! Please choose an OPEN spot!" << endl;
             }
         }
-        else
+        else if (counter > 0)
         {
             board.display();
             cout << "Invalid input! Please pick an integer between 1 and 9. Remember integers are whole numbers!" << endl;
+        }
+        else
+        {
+            board.display();
         }
     }
 }
@@ -136,11 +150,12 @@ bool Game::playAgain()
         string input;
         cin >> input;
         if (cin.fail()) {
-            cout << "1 Invalid input! Please enter 'Y' or 'N'.\n";
+            cout << "Invalid input! Please enter 'Y' or 'N'.\n";
         }
         char choice = toupper(input[0]);
         if (choice == 'Y') 
         {
+            counter = 0;
             return true;
         } 
         else if (choice == 'N') 
