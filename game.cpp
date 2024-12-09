@@ -3,168 +3,187 @@
 #include <string>
 #include <vector>
 
-
 using namespace std;
 
-Game::Game()
-{
-    currentPlayer = 'X';
-}
+Game::Game(bool battleMode) : isBattleMode(battleMode), currentPlayer('X'), counter(0), player1UsedSpecial(false), player2UsedSpecial(false) {}
 
-void Game::start()
-{
+void Game::start() {
+    cout << "Welcome to Tic Tac Toe!" << endl;
+    cout << "Player 1 will go first and will use marker 'X'." << endl;
+    cout << "Player 2 will use marker 'O'." << endl;
+
+    if (isBattleMode) {
+        selectArchetypes();
+    }
+
     bool running = true;
-    while (running)
-    {
+    while (running) {
         board.display();
-        promptMove();
-        if (winChecker(currentPlayer))
-        {
+        if (isBattleMode) {
+            handleBattleMove();
+        } else {
+            promptMove();
+        }
+
+        if (winChecker(currentPlayer)) {
             board.display();
-            cout << "Player " << currentPlayer << " is the winner!" << endl;
+            cout << "Player " << (currentPlayer == 'X' ? "1" : "2") << " is the winner!" << endl;
             running = playAgain();
-            if (running)
-            {
+            if (running) {
                 board.reset();
                 currentPlayer = 'X';
             }
-
-        }
-        else if (board.full())
-        {
+        } else if (board.full()) {
             board.display();
             cout << "It's a draw!" << endl;
             running = playAgain();
-            if (running)
-            {
+            if (running) {
                 board.reset();
                 currentPlayer = 'X';
             }
-        }
-        else
-        {
+        } else {
             switchPlayer();
         }
     }
 }
-bool Game::winChecker(char symbol)
-{
-    int winCombo[8][3] = 
-    {
-        {0,1,2},
-        {3,4,5},
-        {6,7,8},
-        {0,3,6},
-        {1,4,7},
-        {2,5,8},
-        {0,4,8},
-        {2,4,6}
-    };
-    for (auto combo : winCombo)
-    {
-        if (board.grid[combo[0]] == symbol &&
-            board.grid[combo[1]] == symbol &&
-            board.grid[combo[2]] == symbol)
-            {
-                return true;
-            }
-    }
-    return false;
-}
-void Game::switchPlayer()
-{
-    if (currentPlayer == 'X')
-    {
-        currentPlayer = 'O';
-    }
-    else
-    {
-        currentPlayer = 'X';
-    }
-}
-bool Game::validateInput()
-{
-    getline(cin, input); 
-    if (input.empty())
-    {
-        return false;
+
+void Game::selectArchetypes() {
+    cout << "Player 1, choose your archetype (Swarm/Pyromancer): ";
+    while (true) {
+        cin >> player1Archetype;
+        if (player1Archetype == "Swarm" || player1Archetype == "Pyromancer") break;
+        cout << "Invalid archetype. Please choose 'Swarm' or 'Pyromancer': ";
     }
 
-    for (char c : input)
-    {
-        if (!isdigit(c))
-        {
-            return false;
+    cout << "Player 2, choose your archetype (Swarm/Pyromancer): ";
+    while (true) {
+        cin >> player2Archetype;
+        if (player2Archetype == "Swarm" || player2Archetype == "Pyromancer") break;
+        cout << "Invalid archetype. Please choose 'Swarm' or 'Pyromancer': ";
+    }
+}
+
+void Game::handleBattleMove() {
+    string archetype = (currentPlayer == 'X') ? player1Archetype : player2Archetype;
+    bool& usedSpecial = (currentPlayer == 'X') ? player1UsedSpecial : player2UsedSpecial;
+
+    if (archetype == "Pyromancer" && !usedSpecial) {
+        cout << "Do you want to use your special move? (Y/N): ";
+        char choice;
+        cin >> choice;
+        if (toupper(choice) == 'Y') {
+            board.reset();  // Clear the board
+            usedSpecial = true;
+            cout << "The board has been cleared!" << endl;
+            return;
         }
     }
 
-    int value = stoi(input); 
+    promptMove();
+}
 
-    if (value < 1 || value > 9)
-    {
+bool Game::winChecker(char symbol) {
+    int winCombo[8][3] = {
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8},
+        {0, 3, 6},
+        {1, 4, 7},
+        {2, 5, 8},
+        {0, 4, 8},
+        {2, 4, 6}
+    };
+
+    for (auto combo : winCombo) {
+        if (board.grid[combo[0]] == symbol &&
+            board.grid[combo[1]] == symbol &&
+            board.grid[combo[2]] == symbol) {
+            return true;
+        }
+    }
+
+    if (isBattleMode) {
+        string archetype = (currentPlayer == 'X') ? player1Archetype : player2Archetype;
+
+        if (archetype == "Swarm") {
+            if (board.grid[0] == symbol && board.grid[2] == symbol &&
+                board.grid[6] == symbol && board.grid[8] == symbol) {
+                return true;  
+            }
+        }
+    }
+
+    return false;
+}
+
+void Game::switchPlayer() {
+    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+}
+
+bool Game::validateInput() {
+    int value;
+    cout << "Enter a number between 1 and 9: ";
+    
+    if (!(cin >> value)) {
+        cin.clear(); 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
         return false;
     }
+    if (value < 1 || value > 9) {
+        return false;
+    }
+
     validInput = value;
     return true;
 }
 
-void Game::promptMove()
-{
+
+void Game::promptMove() {
     cin.clear();
     bool valid = false;
-    while (!valid)
-    {
-        cin.clear();
-        cout << "\nPlayer " << currentPlayer << ": Enter the number you would like to make a move: " << endl;
-        if (validateInput())
-        {
-            if (board.move(validInput, currentPlayer))
-            {
-                //board.display();
-                counter++;
+
+    while (!valid) {
+        cout << "\nPlayer " << (currentPlayer == 'X' ? "1" : "2") 
+             << ": Enter the number you would like to make a move: ";
+        
+        if (validateInput()) {
+            if (board.move(validInput, currentPlayer)) {
                 valid = true;
-            }
-            else
-            {
+            } else {
                 board.display();
                 cout << "Invalid input! The spot is taken! Please choose an OPEN spot!" << endl;
             }
-        }
-        else if (counter > 0)
-        {
-            board.display();
+        } else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
             cout << "Invalid input! Please pick an integer between 1 and 9. Remember integers are whole numbers!" << endl;
-        }
-        else
-        {
-            board.display();
         }
     }
 }
-bool Game::playAgain()  
-{
-    while (true) 
-    {
+
+
+bool Game::playAgain() {
+    while (true) {
         cin.clear();
         cout << "Do you want to play again? (Y/N): ";
         string input;
         cin >> input;
         if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear invalid input
             cout << "Invalid input! Please enter 'Y' or 'N'.\n";
+            continue;
         }
+
         char choice = toupper(input[0]);
-        if (choice == 'Y') 
-        {
+        if (choice == 'Y') {
             counter = 0;
-            return true;
-        } 
-        else if (choice == 'N') 
-        {
+            player1UsedSpecial = false;
+            player2UsedSpecial = false;
+            return true;  
+        } else if (choice == 'N') {
             cout << "Thank you for playing!\n";
-            return false;
-        } 
-        else 
-        {
+            return false; 
+        } else {
             cout << "Invalid input! Please enter 'Y' or 'N'.\n";
         }
     }
