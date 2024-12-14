@@ -19,15 +19,22 @@ private:
     bool player1UsedSpecial;
     bool player2UsedSpecial;
 
+    int totalGamesPlayed;
+    int player1Wins;
+    int player2Wins;
+    int ties;
+
     void selectArchetypes();
     void handleBattleMove();
 
 public:
     Game(bool battleMode = false);
+
     void start();
     bool winChecker(char symbol);
     bool validateInput();
     void switchPlayer();
     void promptMove();
     bool playAgain();
+    void generateReport(); 
 };

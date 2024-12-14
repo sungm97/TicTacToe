@@ -1,11 +1,15 @@
 #include "game.hpp"
 #include <iostream>
 #include <string>
+#include <fstream>
 #include <vector>
 
 using namespace std;
 
-Game::Game(bool battleMode) : isBattleMode(battleMode), currentPlayer('X'), counter(0), player1UsedSpecial(false), player2UsedSpecial(false) {}
+Game::Game(bool battleMode)
+    : isBattleMode(battleMode), currentPlayer('X'), counter(0),
+      player1UsedSpecial(false), player2UsedSpecial(false),
+      totalGamesPlayed(0), player1Wins(0), player2Wins(0), ties(0) {}
 
 void Game::start() {
     cout << "Welcome to Tic Tac Toe!" << endl;
@@ -28,6 +32,15 @@ void Game::start() {
         if (winChecker(currentPlayer)) {
             board.display();
             cout << "Player " << (currentPlayer == 'X' ? "1" : "2") << " is the winner!" << endl;
+
+            // Update statistics
+            if (currentPlayer == 'X') {
+                player1Wins++;
+            } else {
+                player2Wins++;
+            }
+            totalGamesPlayed++;
+
             running = playAgain();
             if (running) {
                 board.reset();
@@ -36,6 +49,11 @@ void Game::start() {
         } else if (board.full()) {
             board.display();
             cout << "It's a draw!" << endl;
+
+            // Update statistics
+            ties++;
+            totalGamesPlayed++;
+
             running = playAgain();
             if (running) {
                 board.reset();
@@ -45,6 +63,9 @@ void Game::start() {
             switchPlayer();
         }
     }
+
+    // Generate the game report when exiting
+    generateReport();
 }
 
 void Game::selectArchetypes() {
@@ -108,7 +129,7 @@ bool Game::winChecker(char symbol) {
         if (archetype == "Swarm") {
             if (board.grid[0] == symbol && board.grid[2] == symbol &&
                 board.grid[6] == symbol && board.grid[8] == symbol) {
-                return true;  
+                return true;  // Swarm win condition: all four corners
             }
         }
     }
@@ -124,19 +145,21 @@ bool Game::validateInput() {
     int value;
     cout << "Enter a number between 1 and 9: ";
     
+    // Validate input
     if (!(cin >> value)) {
-        cin.clear(); 
+        cin.clear();  // Clear the error flag
         cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
         return false;
     }
+
+    // Check range validity
     if (value < 1 || value > 9) {
         return false;
     }
 
-    validInput = value;
+    validInput = value;  // Store the valid input
     return true;
 }
-
 
 void Game::promptMove() {
     cin.clear();
@@ -160,7 +183,6 @@ void Game::promptMove() {
     }
 }
 
-
 bool Game::playAgain() {
     while (true) {
         cin.clear();
@@ -179,12 +201,30 @@ bool Game::playAgain() {
             counter = 0;
             player1UsedSpecial = false;
             player2UsedSpecial = false;
-            return true;  
+            return true;  // Continue game
         } else if (choice == 'N') {
             cout << "Thank you for playing!\n";
-            return false; 
+            return false;  // End game and generate report
         } else {
             cout << "Invalid input! Please enter 'Y' or 'N'.\n";
         }
     }
+}
+
+void Game::generateReport() {
+    ofstream reportFile("GameReport.txt");
+    if (!reportFile) {
+        cerr << "Error: Could not create game report file." << endl;
+        return;
+    }
+
+    reportFile << "Tic Tac Toe Game Report\n";
+    reportFile << "========================\n";
+    reportFile << "Total Games Played: " << totalGamesPlayed << "\n";
+    reportFile << "Player 1 (X) Wins: " << player1Wins << "\n";
+    reportFile << "Player 2 (O) Wins: " << player2Wins << "\n";
+    reportFile << "Number of Ties: " << ties << "\n";
+
+    reportFile.close();
+    cout << "Game report has been saved to 'GameReport.txt'. Thank you for playing!" << endl;
 }
