@@ -33,7 +33,6 @@ void Game::start() {
             board.display();
             cout << "Player " << (currentPlayer == 'X' ? "1" : "2") << " is the winner!" << endl;
 
-            // Update statistics
             if (currentPlayer == 'X') {
                 player1Wins++;
             } else {
@@ -50,7 +49,6 @@ void Game::start() {
             board.display();
             cout << "It's a draw!" << endl;
 
-            // Update statistics
             ties++;
             totalGamesPlayed++;
 
@@ -64,7 +62,7 @@ void Game::start() {
         }
     }
 
-    // Generate the game report when exiting
+    
     generateReport();
 }
 
@@ -129,7 +127,7 @@ bool Game::winChecker(char symbol) {
         if (archetype == "Swarm") {
             if (board.grid[0] == symbol && board.grid[2] == symbol &&
                 board.grid[6] == symbol && board.grid[8] == symbol) {
-                return true;  // Swarm win condition: all four corners
+                return true;  
             }
         }
     }
@@ -145,19 +143,17 @@ bool Game::validateInput() {
     int value;
     cout << "Enter a number between 1 and 9: ";
     
-    // Validate input
     if (!(cin >> value)) {
-        cin.clear();  // Clear the error flag
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
         return false;
     }
 
-    // Check range validity
     if (value < 1 || value > 9) {
         return false;
     }
 
-    validInput = value;  // Store the valid input
+    validInput = value; 
     return true;
 }
 
@@ -177,7 +173,7 @@ void Game::promptMove() {
                 cout << "Invalid input! The spot is taken! Please choose an OPEN spot!" << endl;
             }
         } else {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Discard invalid input
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input! Please pick an integer between 1 and 9. Remember integers are whole numbers!" << endl;
         }
     }
@@ -191,7 +187,7 @@ bool Game::playAgain() {
         cin >> input;
         if (cin.fail()) {
             cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear invalid input
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input! Please enter 'Y' or 'N'.\n";
             continue;
         }
@@ -201,10 +197,10 @@ bool Game::playAgain() {
             counter = 0;
             player1UsedSpecial = false;
             player2UsedSpecial = false;
-            return true;  // Continue game
+            return true; 
         } else if (choice == 'N') {
             cout << "Thank you for playing!\n";
-            return false;  // End game and generate report
+            return false;  
         } else {
             cout << "Invalid input! Please enter 'Y' or 'N'.\n";
         }
